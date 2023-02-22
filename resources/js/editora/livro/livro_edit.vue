@@ -1,0 +1,109 @@
+<template>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Atualizar dados do Livro</h4>
+                </div>
+                <div class="card-body">
+                    <form @submit.prevent="update">
+                        <div class="row">
+                            <div class="col-12 mb-2">
+                                <div class="form-group">
+                                    <label>Nome</label>
+                                    <input type="text" required class="form-control" v-model="livro.nome">
+                                </div>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <div class="form-group">
+                                    <label>Numero de paginas</label>
+                                    <input type="number" required class="form-control" v-model="livro.numero_paginas">
+                                </div>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <div class="form-group">
+                                    <label>Autor</label>
+                                    <select required class="form-control" v-model="livro.autor_id">
+                                        <option v-for="(autor,key) in Autors" :key="key" v-bind:value="autor.id"> {{ autor.nome }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Atualizar</button>
+                            </div>
+                        </div>                        
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+export default {
+    name:"update-livro",
+    data(){
+        return {
+            livro:{
+                nome:"",
+                numero_paginas:"",
+                autor_id:"",
+                _method:"patch"
+            },
+            Autors:[]
+        }
+    },
+    mounted(){
+        this.verifyUser()
+    },
+    methods:{
+        verifyUser(){
+            var access_token = localStorage.getItem('access_token');
+            if(!access_token || access_token == "" || access_token == null){
+                this.$router.push({name:"login"});
+            }else{
+                this.showLivro();
+                this.getAutors();
+            }
+        },
+        async showLivro(){
+            await this.axios.get(`/api/livro/${this.$route.params.id}`,{
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('access_token')
+                }
+            }).then(response=>{
+                const { nome, numero_paginas, autor_id } = response.data
+                this.livro.nome = nome
+                this.livro.numero_paginas = numero_paginas
+                this.livro.autor_id = autor_id
+            }).catch(error=>{
+                console.log(error)
+            })
+        },
+        async update(){
+            await this.axios.post(`/api/livro/${this.$route.params.id}`,this.livro,{
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('access_token')
+                }
+            }).then(response=>{
+                this.$router.push({name:"livroList"})
+            }).catch(error=>{
+                console.log(error)
+            })
+        },
+        async getAutors(){
+            await this.axios.get('/api/autor',{
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('access_token')
+                }
+            }).then(response=>{
+                this.Autors = response.data;
+            }).catch(error=>{
+                console.log(error)
+                this.Autors = []
+            })
+        },
+    }
+}
+</script>
