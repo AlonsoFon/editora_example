@@ -25,7 +25,7 @@
 
                                   <div class="form-outline mb-4">
                                     <input type="password" 
-                                    placeholder="Sua senha" id="password" required v-model="user.password" class="form-control" />
+                                    placeholder="Sua senha" id="password" required minlength="6" v-model="user.password" class="form-control" />
                                   </div>
 
                                   <div class="text-center pt-1 mb-5 pb-1">
@@ -69,7 +69,7 @@ export default {
             this.axios.post('/api/register',this.user).then(response=>{
             	localStorage.setItem('access_token', response.data.access_token)
                 this.$router.push({name:"autorList"})
-            }).catch(error=>{
+            }).catch(error =>{
                 alert("Um usuario com esse email já foi cadastrado!");
             })
         }

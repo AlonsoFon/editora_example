@@ -147,7 +147,8 @@ var render = function render() {
       type: "password",
       placeholder: "Sua senha",
       id: "password",
-      required: ""
+      required: "",
+      minlength: "6"
     },
     domProps: {
       value: _vm.user.password
